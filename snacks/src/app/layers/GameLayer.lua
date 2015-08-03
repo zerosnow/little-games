@@ -9,26 +9,26 @@ end)
 
 function GameLayer:ctor()
 	math.randomseed(os.time())
-	self.width = 32
-	self.height = 48
+	self.width = 16
+	self.height = 24
 	self.bodyWidth = display.width / self.width
 	self.bodyHeight = display.height / self.height
 	self.body_ = {}
 	self.counter = 0
 	self.food = nil
 	self.direction = RIGHT
-    self:createBody(16, 24)
-    self:createBody(15, 24)
+    self:createBody(8, 12)
+    self:createBody(7, 12)
     self:onStart()
 end
 
 function GameLayer:createBody(x, y)
 	local body = {} 
-	body.sprite = display.newSprite("body.png",{scale9 = true})
+	body.sprite = display.newSprite("body.png",{scale9 = true}):scale(self.bodyWidth / 80)
+
 	body.x = x * self.bodyWidth
 	body.y = y * self.bodyHeight
 	body.sprite:align(display.BOTTOM_LEFT, body.x, body.y)
-	body.sprite:setContentSize(self.bodyWidth, self.bodyHeight)
 	body.sprite:addTo(self)
 	self.body_[#self.body_+1] = body	
 end
@@ -39,7 +39,6 @@ function GameLayer:onStart()
 end
 
 function GameLayer:running()
-	print("1")
 	if self.food == nil then 
 		self:createFood()
 	end
@@ -70,6 +69,7 @@ function GameLayer:running()
 		self.counter = 0
 	end
 	if self.body_[1].x == self.food.x and self.body_[1].y == self.food.y then 
+		self:removeChild(self.food.sprite)
 		self.food = nil
 		self:createFood()
 		self:createBody(self.body_[#self.body_-1].x * 2 - self.body_[#self.body_].x, self.body_[#self.body_-1].y * 2 - self.body_[#self.body_].y)
@@ -81,7 +81,7 @@ function GameLayer:createFood()
 	local collision = true
 	while collision do
 		x = math.random(1, self.width)
-		y = math.random(1,self.height)
+		y = math.random(1, self.height)
 		collision = false
 		for i = 1, #self.body_ do
 			if x == self.body_[i].x and y == self.body_[i].y then
@@ -89,14 +89,13 @@ function GameLayer:createFood()
 			end
 		end
 	end
-	food.sprite = display.newSprite("body.png",{scale9 = true})
+	food.sprite = display.newSprite("body.png",{scale9 = true}):scale(self.bodyWidth / 80)
 	food.x = x * self.bodyWidth
 	food.y = y * self.bodyHeight
 	self.food = food
 	food.sprite:align(display.BOTTOM_LEFT, food.x, food.y)
-	food.sprite:setContentSize(self.bodyWidth, self.bodyHeight)
 	food.sprite:addTo(self)
-	self.food.sprite:runAction(cc.Blink:create(0.5, 100))
+	self.food.sprite:runAction(cc.Blink:create(50, 100))
 end
 
 return GameLayer
